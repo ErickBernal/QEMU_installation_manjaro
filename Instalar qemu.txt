@@ -1,0 +1,61 @@
+ //------------------------------------ instalacion qemu ------------------------------------------------
+Instalando QEMU el mejor virtualizador
+    >   sudo pacman -S  qemu-arch-extra qemu-block-gluster qemu-block-iscsi qemu-block-rbd samba edk2-ovmf
+
+
+Instalando libvirt
+    >   sudo pacman -S virt-viewer virt-manager libvirt ebtables dnsmasq bridge-utils openbsd-netcat
+
+
+Activamos servicios de libvirt
+    >   sudo systemctl enable --now libvirtd virtlogd
+    >   sudo systemctl enable --now virtlogd.socket
+    >   sudo systemctl enable --now virtlockd.socket
+
+
+Monitor SPICE
+    >   sudo pacman -S spice spice-gtk spice-vdagent xf86-video-qxl
+    >   sudo systemctl enable --now spice-vdagentd
+
+
+Para Ejecutarlo:
+    >   sudo virt-manager
+
+//-------------------------------   disco auto-incrementable ------------------------
+// Para que qemu, concidere un disco de aumento automatico es necesario ejecutar el comando siguiente, de
+//lo contrario qemu, utilizara el total del tamano de disco que se a establecido(eje: 15 GB).
+//Nota:
+//   <<NOMBRE_DISCO_A_CREAR>>        = rocky     //(el nombre de disco necesita seguir de la extension ".qcow2")
+//    size del disco, en gigabytes    = 15G 
+
+
+    >  sudo qemu-img create -f qcow2 -o preallocation=off rocky.qcow2 15G
+
+//--------------------------------------- problema al ejecutar virt-mangerr ---------------------------------------------
+//si al ejecutar virt-manager desde las aplicaciones (si ser super usuario), da error
+//entonces aplicar los siguiente
+// 
+//    Nota:
+//        libvirt:    nombre de la app
+//        pilloubool: nombre de usuario linux del host
+
+    >   sudo usermod -aG libvirt pilloubool
+
+
+//----------------------------------- Si falla la conexión de NAT (internet) -------------------------------------------------
+
+Ver lista
+    >   sudo virsh net-list --all
+Definir conexión NAT
+    >   sudo virsh net-define /etc/libvirt/qemu/networks/default.xml
+Que inicie automatico
+    >   sudo virsh net-autostart default
+Activar NAT
+    >   sudo virsh net-start default
+
+//---------------------------------- autodimensionar gui de imagen virtualizada , tambien permite copiar y pegar entre imagen y host--------------------------------------------------
+Instalar en el sistema emulado (con gui)
+    >   qemu qemu-guest-agent
+
+Activamos el servicio para GUEST
+    >   systemctl enable --now qemu-guest-agent
